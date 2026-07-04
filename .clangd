@@ -1,0 +1,11 @@
+CompileFlags:
+  # Force clangd to use a specific compiler and flags
+  Add: [ 
+    "-std=c++23",                  # Language standard
+    "-nostdinc++",                                 # Drop Apple Clang standard C++ headers
+    "-isystem/opt/homebrew/include",
+    "-isystem/opt/homebrew/Cellar/gcc/16.1.0/include/c++/16",
+    "-isystem/opt/homebrew/Cellar/gcc/16.1.0/include/c++/16/aarch64-apple-darwin25"
+  ]
+  # Compiler: "/opt/homebrew/bin/g++-16"   # Path to your preferred compiler
+
