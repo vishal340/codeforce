@@ -4,11 +4,19 @@ using namespace std;
 using vi = vector<int>;
 
 void solve() {
-  int n;
+  int i, n;
   cin >> n;
+  vi a(n);
   long long ans = 0;
-  for (int i = 1; i <= n; i++) {
-    ans += (long long)(n / i) * (n / i);
+  for (i = 0; i < n; i++) {
+    cin >> a[i];
+  }
+  for (i = 0; i < n; i++) {
+    if (ans <= a[i])
+      ans = ans = a[i];
+    else {
+      ans += a[i];
+    }
   }
   cout << ans << '\n';
 }
@@ -21,5 +29,6 @@ int main() {
   cin >> t;
   while (t--)
     solve();
+
   return 0;
 }

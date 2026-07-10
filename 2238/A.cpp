@@ -4,19 +4,42 @@ using namespace std;
 using vi = vector<int>;
 
 void solve() {
-  int n;
-  cin >> n;
-  vi vec(n);
-  for (int i = 0; i < n; i++)
-    cin >> vec[i];
-  int ans = vec[0];
-  for (int i = 0; i < n - 1; i++) {
-    if (vec[i + 1] > vec[i]) {
-      vec[i + 1] = vec[i];
-    }
-    ans += vec[i + 1];
+  int n, c;
+  cin >> n >> c;
+  vi a1(n), b1(n);
+  for (int i = 0; i < n; i++) {
+    cin >> a1[i];
   }
-  cout << ans << '\n';
+  for (int i = 0; i < n; i++) {
+    cin >> b1[i];
+  }
+  int ans = 0;
+  for (int i = 0; i < n; i++) {
+    if (a1[i] < b1[i]) {
+      ans = -1;
+      break;
+    }
+    ans += a1[i] - b1[i];
+  }
+  int temp = c;
+  sort(a1.begin(), a1.end());
+  sort(b1.begin(), b1.end());
+  for (int i = 0; i < n; i++) {
+    if (a1[i] < b1[i]) {
+      temp = -1;
+      break;
+    }
+    temp += a1[i] - b1[i];
+  }
+  if (ans < 0 && temp < 0) {
+    cout << -1 << '\n';
+  } else if (ans < 0) {
+    cout << temp << '\n';
+  } else if (temp < 0) {
+    cout << ans << '\n';
+  } else {
+    cout << min(ans, temp) << '\n';
+  }
 }
 
 int main() {
