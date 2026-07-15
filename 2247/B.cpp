@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <climits>
 using namespace std;
 
 using ll = long long;
@@ -128,33 +127,24 @@ template <typename T, typename... V> void _print(T t, V... v) {
 #define debug(x...)
 #endif
 
-ci N = 1e5;
+const int N = 2e5;
 int a[N];
-
-int cost(int x) { return __builtin_popcount(x) + 31 - __builtin_clz(x); }
-
-int best(int v, int k) {
-  int step = 1 << k;
-  int x = (v + step - 1) / step * step;
-  int ret = INT_MAX;
-  for (int t = x; t <= x + 32; t += step)
-    ret = min(ret, (t - v) + cost(t >> k));
-  return ret;
-}
-
 void solve() {
   int i, n;
   cin >> n;
   for (i = 0; i < n; i++)
     cin >> a[i];
-  ll ans = LLONG_MAX;
-  for (int k = 0; k <= 17; k++) {
-    ll cur = k;
-    for (i = 0; i < n; i++)
-      cur += best(a[i], k);
-    ans = min(ans, cur);
+  ll acc = 0;
+  ll c = 0;
+  for (i = 0; i < n; i++) {
+    acc += a[i];
+    c += i + 1;
+    if (acc < c) {
+      cout << "NO\n";
+      return;
+    }
   }
-  cout << ans << '\n';
+  cout << "YES\n";
 }
 
 int main() {

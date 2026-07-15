@@ -128,33 +128,61 @@ template <typename T, typename... V> void _print(T t, V... v) {
 #define debug(x...)
 #endif
 
-ci N = 1e5;
-int a[N];
-
-int cost(int x) { return __builtin_popcount(x) + 31 - __builtin_clz(x); }
-
-int best(int v, int k) {
-  int step = 1 << k;
-  int x = (v + step - 1) / step * step;
-  int ret = INT_MAX;
-  for (int t = x; t <= x + 32; t += step)
-    ret = min(ret, (t - v) + cost(t >> k));
-  return ret;
-}
-
 void solve() {
-  int i, n;
-  cin >> n;
-  for (i = 0; i < n; i++)
-    cin >> a[i];
-  ll ans = LLONG_MAX;
-  for (int k = 0; k <= 17; k++) {
-    ll cur = k;
-    for (i = 0; i < n; i++)
-      cur += best(a[i], k);
-    ans = min(ans, cur);
+  int i, n, q, l, r, k;
+  string s;
+  cin >> n >> q;
+  vector<array<int, 3>> b(q);
+  cin >> s;
+  for (i = 0; i < q; i++) {
+    cin >> b[i][0] >> b[i][1] >> b[i][2];
   }
-  cout << ans << '\n';
+  for (i = 0; i < q; i++) {
+    b[i][0]--;
+    b[i][1]--;
+  }
+  vi c(n, 0), d(n, 0);
+  for (i = 0; i < n; i++) {
+    if (((i & 1) && (s[i] == '1')) || (!(i & 1) && (s[i] == '0'))) {
+      d[i] = 1;
+    } else {
+      c[i] = 1;
+    }
+  }
+  vi e(n, 0), f(n, 0);
+  e[0] = c[0];
+  f[0] = d[0];
+  for (i = 1; i < n; i++) {
+    if (c[i - 1] == 0 && c[i] == 1) {
+      e[i] = e[i - 1] + 1;
+    } else {
+      e[i] = e[i - 1];
+    }
+    if (d[i - 1] == 0 && d[i] == 1) {
+      f[i] = f[i - 1] + 1;
+    } else {
+      f[i] = f[i - 1];
+    }
+  }
+  for (auto &it : b) {
+    int t;
+    if (it[0] == 0) {
+      t = min(e[it[1]], f[it[1]]);
+    } else {
+      int t1 = e[it[0]];
+      if (c[it[0]] != 0)
+        t1--;
+      int t2 = f[it[0]];
+      if (d[it[0]] != 0)
+        t2--;
+      t = min(e[it[1]] - t1, f[it[1]] - t2);
+    }
+    if (it[2] >= t) {
+      cout << "YES\n";
+    } else {
+      cout << "NO\n";
+    }
+  }
 }
 
 int main() {

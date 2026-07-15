@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <climits>
 using namespace std;
 
 using ll = long long;
@@ -128,33 +127,115 @@ template <typename T, typename... V> void _print(T t, V... v) {
 #define debug(x...)
 #endif
 
-ci N = 1e5;
-int a[N];
-
-int cost(int x) { return __builtin_popcount(x) + 31 - __builtin_clz(x); }
-
-int best(int v, int k) {
-  int step = 1 << k;
-  int x = (v + step - 1) / step * step;
-  int ret = INT_MAX;
-  for (int t = x; t <= x + 32; t += step)
-    ret = min(ret, (t - v) + cost(t >> k));
-  return ret;
-}
-
+ci N = 5000;
+array<int, N + 1> inp;
 void solve() {
   int i, n;
   cin >> n;
-  for (i = 0; i < n; i++)
-    cin >> a[i];
-  ll ans = LLONG_MAX;
-  for (int k = 0; k <= 17; k++) {
-    ll cur = k;
-    for (i = 0; i < n; i++)
-      cur += best(a[i], k);
-    ans = min(ans, cur);
+  list<int> a;
+  for (i = 1; i <= n; i++) {
+    cin >> inp[i];
   }
-  cout << ans << '\n';
+  a.assign(inp.begin() + 1, inp.begin() + n + 1);
+  queue<int> b;
+  auto op = [&](int p) -> void {
+    if (p == 1) {
+      if (n > 2) {
+        auto itb = next(a.begin());
+        int t = *itb;
+        a.erase(itb);
+        a.push_back(t);
+      }
+    } else if (p == n - 1) {
+      if (n > 2) {
+        auto itb = a.begin();
+        advance(itb, n - 2);
+        int t = *itb;
+        a.erase(itb);
+        a.push_front(t);
+      }
+    } else {
+      auto itb = a.begin();
+      advance(itb, p - 1);
+      auto itc = itb;
+      itc++;
+      int t = *itb;
+      a.erase(itb);
+      a.push_front(t);
+      t = *itc;
+      a.erase(itc);
+      a.push_back(t);
+    }
+  };
+  auto fpos = [&](int p) -> int {
+    auto itb = a.begin();
+    for (i = 1; i <= n; i++) {
+      if (*itb == p) {
+        return i;
+      }
+      itb++;
+    }
+    return i;
+  };
+  auto it = a.rbegin();
+  auto it1 = it;
+  it1++;
+  while (it1 != a.rend() && (*it) - 1 == *(it1)) {
+    it++;
+    it1++;
+  }
+  if (it1 == a.rend()) {
+    cout << 0 << '\n';
+    return;
+  }
+  if (*it != 1) {
+    int loc = fpos(1);
+    if (loc == 1) {
+      op(2);
+      op(1);
+      b.push(2);
+      b.push(1);
+    } else {
+      op(loc - 1);
+      b.push(loc - 1);
+    }
+  }
+  while (a.front() != 1) {
+    int loc = fpos(a.back() + 1);
+    if (loc > 1) {
+      op(loc - 1);
+      b.push(loc - 1);
+    } else {
+      if (a.back() < n - 2) {
+        op(2);
+        op(1);
+        op(n - 1);
+        b.push(2);
+        b.push(1);
+        b.push(n - 1);
+      } else if (a.back() == n - 2) {
+        b.push(1);
+        for (i = 0; i < n - 2; i++)
+          b.push(n - 1);
+        break;
+      } else if (n & 1) {
+        for (i = 0; i < n - 2; i++)
+          b.push(2);
+        b.push(1);
+        break;
+      } else {
+        cout << -1 << '\n';
+        return;
+      }
+    }
+  }
+  int ss = b.size();
+  cout << ss << '\n';
+  while (ss--) {
+    cout << b.front() << ' ';
+    b.pop();
+  }
+  cout << '\n';
 }
 
 int main() {
