@@ -135,22 +135,12 @@ void solve() {
     cin >> a[i].first;
     a[i].second = i;
   }
-  sort(a.begin(), a.end(),
-       [](auto t1, auto t2) { return t1.first < t2.first; });
+  stable_sort(a.begin(), a.end(),
+              [](auto t1, auto t2) { return t1.first < t2.first; });
   int ret = 0;
   for (i = 0; i < n; i++) {
     int t;
-    int c = 0;
-    if (a[i].second < i) {
-      int j = 1;
-      while (a[i].first == a[i - j].first)
-        j++, c++;
-    } else if (a[i].second > i) {
-      int j = 1;
-      while (a[i].first == a[i + j].first)
-        j++, c--;
-    }
-    t = (a[i].second ^ (i + c));
+    t = (a[i].second ^ i);
     if (t > 0) {
       t = 31 - __builtin_clz(t);
       t = 1 << t;

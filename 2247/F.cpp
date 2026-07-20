@@ -1,6 +1,4 @@
-#include <algorithm>
 #include <bits/stdc++.h>
-#include <climits>
 using namespace std;
 
 using ll = long long;
@@ -34,7 +32,7 @@ template <class Fun> decltype(auto) y_combinator(Fun &&fun) {
   return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
 }
 
-constexpr int MOD = 1e9 + 7;
+constexpr int MOD = 998244353;
 
 struct mint {
   int val = 0;
@@ -130,74 +128,96 @@ template <typename T, typename... V> void _print(T t, V... v) {
 #endif
 
 void solve() {
-  int i, n, q;
-  cin >> n >> q;
-  vi a(n);
+  int i, n, m;
+  cin >> n >> m;
+  vector<string> s(n);
   for (i = 0; i < n; i++)
-    cin >> a[i];
-  if (n == 1) {
-    cout << 0 << '\n';
-    for (int j = 0; j < q; j++) {
-      int k, x;
-      cin >> k >> x;
-      cout << 0 << '\n';
+    cin >> s[i];
+  vector<vector<bool>> rh(n, vector<bool>(m, 0));
+  rh[n - 1][m - 1] = 1;
+  for (i = n - 2; i >= 0; i--) {
+    for (int j = 0; i + j < min(n, m); j++) {
+      if (s[i + j][m - 1 - j] == '1' &&
+          ((i + j < n - 1 && rh[i + j + 1][m - 1 - j] == 1) ||
+           (j > 0 && rh[i + j][m - j] == 1)))
+        rh[i + j][m - 1 - j] = 1;
     }
-    return;
   }
-  int p = 32 - __builtin_clz(n - 1);
-  int N = 1 << p;
-  a.resize(N, INT_MAX);
-  vector<vector<array<int, 3>>> acc(p);
-  for (i = 0; i < N; i += 2) {
-    if (a[i] <= a[i + 1])
-      acc[0].push_back({0, a[i], a[i + 1]});
+  for (i = m - 2; i >= 0; i--) {
+    for (int j = 0; j <= min(n - 1, i); j++) {
+      if (s[j][i - j] == '1' && (j + 1 < n && (rh[j + 1][i - j] == 1) ||
+                                 (i - j < m - 1 && rh[j][i - j + 1] == 1)))
+        rh[j][i - j] = 1;
+    }
+  }
+  for (i = 1; i < m; i++) {
+    if (rh[0][i - 1] == 0)
+      rh[0][i] = 0;
+    if (i < n && rh[i - 1][0] == 0)
+      rh[i][0] = 0;
+    for (int j = 1; j < min(n - 1, i); j++) {
+      if (rh[j - 1][i - j] == 0 && rh[j][i - j - 1] == 0)
+        rh[j][i - j] = 0;
+    }
+  }
+  for (i = 1; i < n; i++) {
+    if (i <= (n - m) && rh[i - 1][0] == 0)
+      rh[i][0] = 0;
+    for (int j = 0; i + j < min(n, m); j++) {
+      if (rh[i + j - 1][m - 1 - j] == 0 && rh[i + j][m - j - 2] == 0)
+        rh[i + j][m - 1 - j] = 0;
+    }
+  }
+
+  int ret1 = 0;
+  int ones = 0;
+  int zeros = 0;
+  for (i = 0; i < m; i++) {
+    int t = 0;
+    for (int j = 0; j < min(n, i + 1); j++) {
+      if (rh[j][i - j])
+        t += s[j][i - j] - '0';
+      else {
+        zeros++;
+      }
+    }
+    if (t == 1)
+      ones++;
     else {
-      acc[0].push_back({1, a[i + 1], a[i]});
+      ret1 += t;
     }
   }
-  for (i = 1; i < p; i++) {
-    N /= 2;
-    for (int j = 0; j < N; j += 2) {
-      if (acc[i - 1][j][2] > acc[i - 1][j + 1][1]) {
-        acc[i].push_back({1 << i, min(acc[i - 1][j][1], acc[i - 1][j + 1][1]),
-                          max(acc[i - 1][j][2], acc[i - 1][j + 1][2])});
-      } else {
-        acc[i].push_back({max(acc[i - 1][j][0], acc[i - 1][j + 1][0]),
-                          acc[i - 1][j][1], acc[i - 1][j + 1][2]});
+  for (i = 1; i < n; i++) {
+    int t = 0;
+    for (int j = 0; j < min(n - i, m); j++) {
+      if (rh[i + j][m - 1 - j])
+        t += s[i + j][m - 1 - j] - '0';
+      else {
+        zeros++;
       }
     }
-  }
-  cout << acc[p - 1][0][0] << '\n';
-  for (int j = 0; j < q; j++) {
-    int k, x;
-    cin >> k >> x;
-    a[k] = x;
-    k /= 2;
-    if (a[2 * k] <= a[2 * k + 1]) {
-      acc[0][k] = {0, a[2 * k], a[2 * k + 1]};
-    } else {
-      acc[0][k] = {1, a[2 * k + 1], a[2 * k]};
+    if (t == 1)
+      ones++;
+    else {
+      ret1 += t;
     }
-    for (i = 1; i < p; i++) {
-      k /= 2;
-      if (acc[i - 1][2 * k][2] > acc[i - 1][2 * k + 1][1]) {
-        acc[i][k] = {1 << i,
-                     min(acc[i - 1][2 * k][1], acc[i - 1][2 * k + 1][1]),
-                     max(acc[i - 1][2 * k][2], acc[i - 1][2 * k + 1][2])};
-      } else {
-        acc[i][k] = {max(acc[i - 1][2 * k][0], acc[i - 1][2 * k + 1][0]),
-                     acc[i - 1][2 * k][1], acc[i - 1][2 * k + 1][2]};
-      }
-    }
-    cout << acc[p - 1][0][0] << '\n';
   }
+  ll t1 = 1, t2 = 1;
+  for (i = 0; i < zeros; i++) {
+    t1 = (t1 * 2) % MOD;
+  }
+  for (i = 0; i < ones; i++) {
+    t2 = (t2 * 2) % MOD;
+  }
+  ll ret = (t1 - 1 + t2 - 1 + ret1) % MOD;
+  cout << ret << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(nullptr);
 
-  // cout << fixed << setprecision(12);
+  cout << fixed << setprecision(12);
 
   int t = 1;
   if (cin >> t) {

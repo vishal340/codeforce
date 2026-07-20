@@ -1,6 +1,4 @@
-#include <algorithm>
 #include <bits/stdc++.h>
-#include <climits>
 using namespace std;
 
 using ll = long long;
@@ -130,66 +128,67 @@ template <typename T, typename... V> void _print(T t, V... v) {
 #endif
 
 void solve() {
-  int i, n, q;
-  cin >> n >> q;
-  vi a(n);
-  for (i = 0; i < n; i++)
-    cin >> a[i];
-  if (n == 1) {
-    cout << 0 << '\n';
-    for (int j = 0; j < q; j++) {
-      int k, x;
-      cin >> k >> x;
-      cout << 0 << '\n';
-    }
+  int i, n, k;
+  cin >> n >> k;
+  if (k & 1) {
+    cout << -1 << '\n';
     return;
   }
-  int p = 32 - __builtin_clz(n - 1);
-  int N = 1 << p;
-  a.resize(N, INT_MAX);
-  vector<vector<array<int, 3>>> acc(p);
-  for (i = 0; i < N; i += 2) {
-    if (a[i] <= a[i + 1])
-      acc[0].push_back({0, a[i], a[i + 1]});
-    else {
-      acc[0].push_back({1, a[i + 1], a[i]});
-    }
+  k -= 2 * n - 2;
+  if (k < 0) {
+    cout << -1 << '\n';
+    return;
   }
-  for (i = 1; i < p; i++) {
-    N /= 2;
-    for (int j = 0; j < N; j += 2) {
-      if (acc[i - 1][j][2] > acc[i - 1][j + 1][1]) {
-        acc[i].push_back({1 << i, min(acc[i - 1][j][1], acc[i - 1][j + 1][1]),
-                          max(acc[i - 1][j][2], acc[i - 1][j + 1][2])});
-      } else {
-        acc[i].push_back({max(acc[i - 1][j][0], acc[i - 1][j + 1][0]),
-                          acc[i - 1][j][1], acc[i - 1][j + 1][2]});
-      }
-    }
-  }
-  cout << acc[p - 1][0][0] << '\n';
-  for (int j = 0; j < q; j++) {
-    int k, x;
-    cin >> k >> x;
-    a[k] = x;
-    k /= 2;
-    if (a[2 * k] <= a[2 * k + 1]) {
-      acc[0][k] = {0, a[2 * k], a[2 * k + 1]};
+  k >>= 1;
+  vi ret(n);
+  ret[0] = 1;
+  ret[n - 1] = n;
+  int g = n - 2;
+  i = 1;
+  while (k > 0 && i < n - 1) {
+    if (g <= k + 1) {
+      ret[i] = ret[i - 1] + g;
+      k -= g - 1;
+      g -= 2;
     } else {
-      acc[0][k] = {1, a[2 * k + 1], a[2 * k]};
+      ret[i] = ret[i - 1] + k + 1;
+      k = 0;
     }
-    for (i = 1; i < p; i++) {
-      k /= 2;
-      if (acc[i - 1][2 * k][2] > acc[i - 1][2 * k + 1][1]) {
-        acc[i][k] = {1 << i,
-                     min(acc[i - 1][2 * k][1], acc[i - 1][2 * k + 1][1]),
-                     max(acc[i - 1][2 * k][2], acc[i - 1][2 * k + 1][2])};
-      } else {
-        acc[i][k] = {max(acc[i - 1][2 * k][0], acc[i - 1][2 * k + 1][0]),
-                     acc[i - 1][2 * k][1], acc[i - 1][2 * k + 1][2]};
+    ret[i + 1] = ret[i - 1] + 1;
+    i += 2;
+  }
+  if (k > 0) {
+    cout << -1 << '\n';
+    return;
+  }
+  int j1 = i - 2, j2 = i - 4;
+  if (j1 > 0) {
+    for (int j = ret[i - 1] + 1; j < ret[j1]; j++) {
+      ret[i] = j;
+      i++;
+    }
+    if (j2 > 0) {
+      for (int j = ret[j1] + 1; j < ret[j2]; j++) {
+        ret[i] = j;
+        i++;
+      }
+    } else {
+      for (int j = ret[j1] + 1; j < n; j++) {
+        ret[i] = j;
+        i++;
       }
     }
-    cout << acc[p - 1][0][0] << '\n';
+    vi res(n);
+    for (i = 0; i < n; i++) {
+      res[ret[i] - 1] = i + 1;
+    }
+    for (i = 0; i < n - 1; i++) {
+      cout << res[i] << ' ' << res[i + 1] << '\n';
+    }
+  } else {
+    for (i = 0; i < n - 1; i++) {
+      cout << i + 1 << ' ' << i + 2 << '\n';
+    }
   }
 }
 
@@ -197,7 +196,7 @@ int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(nullptr);
 
-  // cout << fixed << setprecision(12);
+  cout << fixed << setprecision(12);
 
   int t = 1;
   if (cin >> t) {
