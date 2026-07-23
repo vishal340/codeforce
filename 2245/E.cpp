@@ -32,7 +32,7 @@ template <class Fun> decltype(auto) y_combinator(Fun &&fun) {
   return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
 }
 
-constexpr int MOD = 998244353;
+constexpr int MOD = 1e9 + 7;
 
 struct mint {
   int val = 0;
@@ -102,7 +102,7 @@ template <typename T, typename V> void __print(const pair<T, V> &x) {
   __print(x.second);
   cerr << '}';
 }
-template <typename T> void __print(const T &x) {
+template <typename T> void __print(const vector<T> &x) {
   int f = 0;
   cerr << '{';
   for (auto &i : x) {
@@ -128,85 +128,39 @@ template <typename T, typename... V> void _print(T t, V... v) {
 #endif
 
 void solve() {
-  int i, n, m;
-  cin >> n >> m;
-  vector<string> s(n);
-  for (i = 0; i < n; i++)
-    cin >> s[i];
-  vector<vector<bool>> from_start(n, vector<bool>(m, false));
-  from_start[0][0] = true;
-  for (int r = 0; r < n; r++) {
-    for (int c = 0; c < m; c++) {
-      if (!from_start[r][c])
-        continue;
-      if (r + 1 < n && s[r + 1][c] == '1')
-        from_start[r + 1][c] = true;
-      if (c + 1 < m && s[r][c + 1] == '1')
-        from_start[r][c + 1] = true;
-    }
+  int i, n;
+  cin >> n;
+  vector<vi> g(n);
+  for (i = 0; i < n - 1; i++) {
+    int x, y;
+    cin >> x >> y;
+    x--, y--;
+    g[x].push_back(y);
+    g[y].push_back(x);
   }
-
-  vector<vector<bool>> to_end(n, vector<bool>(m, false));
-  to_end[n - 1][m - 1] = true;
-  for (int r = n - 1; r >= 0; r--) {
-    for (int c = m - 1; c >= 0; c--) {
-      if (!to_end[r][c])
-        continue;
-      if (r - 1 >= 0 && s[r - 1][c] == '1')
-        to_end[r - 1][c] = true;
-      if (c - 1 >= 0 && s[r][c - 1] == '1')
-        to_end[r][c - 1] = true;
-    }
-  }
-
-  vector<vector<bool>> rh(n, vector<bool>(m, false));
-  for (int r = 0; r < n; r++) {
-    for (int c = 0; c < m; c++) {
-      rh[r][c] = from_start[r][c] && to_end[r][c];
-    }
-  }
-  int ret1 = 0;
-  int ones = 0;
-  int zeros = 0;
-  for (i = 0; i < m; i++) {
-    int t = 0;
-    for (int j = 0; j < min(n, i + 1); j++) {
-      if (rh[j][i - j])
-        t += s[j][i - j] - '0';
-      else {
-        zeros++;
+  vector<bool> vis(n, false);
+  int c = 0, res = 0;
+  auto la = y_combinator([&](const auto &self, int v) -> void {
+    vis[v] = true;
+    for (auto u : g[v]) {
+      if (g[u].size() & 1)
+        res += c++;
+      else if (!vis[u]) {
+        self(u);
       }
     }
-    if (t == 1)
-      ones++;
-    else {
-      ret1 += t;
+  });
+  for (i = 0; i < n; i++) {
+    if (~g[i].size() & 1 && !vis[i]) {
+      c = 0;
+      la(i);
     }
   }
-  for (i = 1; i < n; i++) {
-    int t = 0;
-    for (int j = 0; j < min(n - i, m); j++) {
-      if (rh[i + j][m - 1 - j])
-        t += s[i + j][m - 1 - j] - '0';
-      else {
-        zeros++;
-      }
-    }
-    if (t == 1)
-      ones++;
-    else {
-      ret1 += t;
-    }
-  }
-  ll t1 = 1, t2 = 1;
-  for (i = 0; i < zeros; i++) {
-    t1 = (t1 * 2) % MOD;
-  }
-  for (i = 0; i < ones; i++) {
-    t2 = (t2 * 2) % MOD;
-  }
-  ll ret = (t1 - 1 + t2 - 1 + ret1) % MOD;
-  cout << ret << '\n';
+  for (int u = 0; u < n; u++)
+    for (auto v : g[u])
+      if (v > u)
+        res += g[u].size() & g[v].size() & 1;
+  cout << res << '\n';
 }
 
 int main() {
