@@ -111,70 +111,37 @@ const int N = 2e5;
 void solve() {
   int i, n;
   cin >> n;
-  vector<int> b(n);
-  ll neg = 0, pos = 0;
-  int z = 0;
-  vi c;
-  multiset<int> d;
+  string s;
+  cin >> s;
+  int acc = 0;
   for (i = 0; i < n; i++) {
-    cin >> b[i];
-  }
-  for (i = 0; i < n; i++) {
-    if (b[i] < 0) {
-      neg += -1 * b[i];
-      d.insert(-1 * b[i]);
-    } else if (b[i] > 0) {
-      pos += b[i];
-      c.push_back(b[i]);
-    } else {
-      z++;
+    if (s[i] == '0')
+      acc--;
+    else {
+      acc++;
     }
   }
-  sort(all(c));
-  if (pos <= neg) {
+  if (abs(acc) > 2) {
     cout << -1 << '\n';
     return;
   }
-  if (pos > neg) {
-    ll t = c[0];
-    cout << t << ' ';
-    i = 1;
-    bool zeroes = true;
-    while (d.size()) {
-      do {
-        auto it = d.lower_bound(t);
-        if (it != d.begin()) {
-          it--;
-          t -= *it;
-          d.erase(it);
-          cout << t << ' ';
-        } else {
-          if (zeroes) {
-            zeroes = false;
-            for (int j = 0; j < z; j++)
-              cout << t << ' ';
-          }
-          if (i < c.size()) {
-            t += c[i];
-            i++;
-            cout << t << ' ';
-          }
-          break;
-        }
-      } while (true);
-    }
-    if (zeroes) {
-      zeroes = false;
-      for (int j = 0; j < z; j++)
-        cout << t << ' ';
-    }
-    while (i < c.size()) {
-      t += c[i];
-      i++;
-      cout << t << ' ';
+  int ret = 0;
+  int o = 0, z = 0;
+  for (i = 1; i < n; i++) {
+    if (s[i] == s[i - 1]) {
+      if (s[i] == '1')
+        o++;
+      else {
+        z++;
+      }
     }
   }
-  cout << '\n';
+  if (o == z) {
+    ret = 2 * o;
+  } else {
+    ret = 2 * max(o, z) - 1;
+  }
+  cout << ret << '\n';
 }
 
 int main() {

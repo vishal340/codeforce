@@ -108,83 +108,92 @@ template <typename T, typename... V> void _print(T t, V... v) {
 
 const int N = 2e5;
 
-void solve() {
-  int i, n;
+void solve2() {
+  int i = 0, n;
   cin >> n;
-  vector<int> b(n);
-  ll neg = 0, pos = 0;
-  int z = 0;
-  vi c;
-  multiset<int> d;
+  vector<string> s(n);
+  for (i = 0; i < n; i++)
+    cin >> s[i];
+  int sx = 0, sy = 0;
+  int c = 0;
+  for (i = 0; i < n; i++)
+    for (int j = 0; j < n; j++) {
+      if (s[i][j] == '#') {
+        sx += i + 1, sy += j + 1, c++;
+      }
+    }
+  int inv = 1;
+  while (1LL * inv * c % n != 1)
+    ++inv;
+  int rx = 1LL * inv * (sx % n) % n;
+  int ry = 1LL * inv * (sy % n) % n;
+  if (rx == 0)
+    rx = n;
+  if (ry == 0)
+    ry = n;
+  cout << rx << ' ' << ry << '\n' << flush;
+}
+void solve1() {
+  int i = 0, n;
+  cin >> n;
+  vector<string> s(n);
+  for (i = 0; i < n; i++)
+    cin >> s[i];
+  int x, y;
+  cin >> x >> y;
+  int sx = 0, sy = 0;
+  int c = 0;
   for (i = 0; i < n; i++) {
-    cin >> b[i];
-  }
-  for (i = 0; i < n; i++) {
-    if (b[i] < 0) {
-      neg += -1 * b[i];
-      d.insert(-1 * b[i]);
-    } else if (b[i] > 0) {
-      pos += b[i];
-      c.push_back(b[i]);
-    } else {
-      z++;
+    for (int j = 0; j < n; j++) {
+      if (s[i][j] == '#')
+        sx += i + 1, sy += j + 1, c++;
     }
   }
-  sort(all(c));
-  if (pos <= neg) {
-    cout << -1 << '\n';
-    return;
-  }
-  if (pos > neg) {
-    ll t = c[0];
-    cout << t << ' ';
-    i = 1;
-    bool zeroes = true;
-    while (d.size()) {
-      do {
-        auto it = d.lower_bound(t);
-        if (it != d.begin()) {
-          it--;
-          t -= *it;
-          d.erase(it);
-          cout << t << ' ';
-        } else {
-          if (zeroes) {
-            zeroes = false;
-            for (int j = 0; j < z; j++)
-              cout << t << ' ';
-          }
-          if (i < c.size()) {
-            t += c[i];
-            i++;
-            cout << t << ' ';
-          }
-          break;
+  x *= c, y *= c;
+  sx = (x + c * n - sx) % n, sy = (y + c * n - sy) % n;
+  if (sx == 0 && sy == 0) {
+    for (i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        if (s[i][j] == '#') {
+          cout << i + 1 << ' ' << j + 1 << ' ' << i + 1 << ' ' << j + 1 << '\n'
+               << flush;
+          return;
         }
-      } while (true);
-    }
-    if (zeroes) {
-      zeroes = false;
-      for (int j = 0; j < z; j++)
-        cout << t << ' ';
-    }
-    while (i < c.size()) {
-      t += c[i];
-      i++;
-      cout << t << ' ';
+      }
     }
   }
-  cout << '\n';
+  for (i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      if (s[i][j] == '#' and s[(i + sx) % n][(j + sy) % n] != '#') {
+        cout << i + 1 << ' ' << j + 1 << ' ' << (i + sx) % n + 1 << ' '
+             << (j + sy) % n + 1 << '\n'
+             << flush;
+        return;
+      }
+    }
+  }
 }
 
 int main() {
-  ios_base::sync_with_stdio(false);
-  cin.tie(nullptr);
+  // ios_base::sync_with_stdio(false);
+  // cin.tie(nullptr);
 
-  int t = 1;
-  if (cin >> t) {
-    while (t--) {
-      solve();
+  string s;
+  cin >> s;
+  if (s == "second") {
+    int t = 1;
+    if (cin >> t) {
+      while (t--) {
+        solve2();
+      }
+    }
+  }
+  if (s == "first") {
+    int t = 1;
+    if (cin >> t) {
+      while (t--) {
+        solve1();
+      }
     }
   }
   return 0;

@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <climits>
 using namespace std;
 
 using ll = long long;
@@ -109,72 +110,36 @@ template <typename T, typename... V> void _print(T t, V... v) {
 const int N = 2e5;
 
 void solve() {
-  int i, n;
-  cin >> n;
-  vector<int> b(n);
-  ll neg = 0, pos = 0;
-  int z = 0;
-  vi c;
-  multiset<int> d;
+  int i, n, m;
+  cin >> n >> m;
+  vi v(n);
   for (i = 0; i < n; i++) {
-    cin >> b[i];
+    cin >> v[i];
   }
-  for (i = 0; i < n; i++) {
-    if (b[i] < 0) {
-      neg += -1 * b[i];
-      d.insert(-1 * b[i]);
-    } else if (b[i] > 0) {
-      pos += b[i];
-      c.push_back(b[i]);
-    } else {
-      z++;
+  vector<vector<int>> a(n, vi(m));
+  for (i = 0; i < n; i++)
+    for (int j = 0; j < m; j++)
+      cin >> a[i][j];
+
+  vector<int> vec;
+  int ret = m;
+  for (i = n - 1; i >= 0; i--) {
+    for (int j = 0; j < m; j++) {
+      vec.push_back(a[i][j]);
+    }
+    sort(vec.begin(), vec.end(), greater<int>());
+    vec.resize(m);
+    int temp = 0;
+    int len = vec.size() - 1;
+    for (int j = 0; j < m; j++) {
+      temp += vec[j];
+      if (temp >= v[i]) {
+        ret = min(ret, j + 1);
+        break;
+      }
     }
   }
-  sort(all(c));
-  if (pos <= neg) {
-    cout << -1 << '\n';
-    return;
-  }
-  if (pos > neg) {
-    ll t = c[0];
-    cout << t << ' ';
-    i = 1;
-    bool zeroes = true;
-    while (d.size()) {
-      do {
-        auto it = d.lower_bound(t);
-        if (it != d.begin()) {
-          it--;
-          t -= *it;
-          d.erase(it);
-          cout << t << ' ';
-        } else {
-          if (zeroes) {
-            zeroes = false;
-            for (int j = 0; j < z; j++)
-              cout << t << ' ';
-          }
-          if (i < c.size()) {
-            t += c[i];
-            i++;
-            cout << t << ' ';
-          }
-          break;
-        }
-      } while (true);
-    }
-    if (zeroes) {
-      zeroes = false;
-      for (int j = 0; j < z; j++)
-        cout << t << ' ';
-    }
-    while (i < c.size()) {
-      t += c[i];
-      i++;
-      cout << t << ' ';
-    }
-  }
-  cout << '\n';
+  cout << ret << '\n';
 }
 
 int main() {

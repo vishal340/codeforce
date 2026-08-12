@@ -128,14 +128,16 @@ void solve() {
     return;
   }
   i = 0;
-  int j = 0, ret = 0;
+  int j = 0;
+  ll ret = 0;
   while (i < n && j < n) {
     if (s1[i] != s2[j]) {
       i += 2 * (1 - (s1[i] - '0'));
       j += 2 * (1 - (s2[j] - '0'));
     } else {
+      if (s1[i] == '1')
+        ret += abs(i - j) / 2;
       i += 2, j += 2;
-      ret += abs(i - j) / 2;
     }
   }
   i = 1, j = 1;
@@ -144,8 +146,9 @@ void solve() {
       i += 2 * (1 - (s1[i] - '0'));
       j += 2 * (1 - (s2[j] - '0'));
     } else {
+      if (s1[i] == '1')
+        ret += abs(i - j) / 2;
       i += 2, j += 2;
-      ret += abs(i - j) / 2;
     }
   }
   cout << ret << '\n';

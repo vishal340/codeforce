@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <unordered_map>
 using namespace std;
 
 using ll = long long;
@@ -111,70 +112,21 @@ const int N = 2e5;
 void solve() {
   int i, n;
   cin >> n;
-  vector<int> b(n);
-  ll neg = 0, pos = 0;
-  int z = 0;
-  vi c;
-  multiset<int> d;
+  map<int, int> a;
   for (i = 0; i < n; i++) {
-    cin >> b[i];
+    int x;
+    cin >> x;
+    a[x]++;
   }
-  for (i = 0; i < n; i++) {
-    if (b[i] < 0) {
-      neg += -1 * b[i];
-      d.insert(-1 * b[i]);
-    } else if (b[i] > 0) {
-      pos += b[i];
-      c.push_back(b[i]);
+  int ret = 0;
+  for (auto it : a) {
+    if (it.second < (n + 3) / 2) {
+      ret += it.first * it.second;
     } else {
-      z++;
+      ret += it.first * (n - it.second + 2);
     }
   }
-  sort(all(c));
-  if (pos <= neg) {
-    cout << -1 << '\n';
-    return;
-  }
-  if (pos > neg) {
-    ll t = c[0];
-    cout << t << ' ';
-    i = 1;
-    bool zeroes = true;
-    while (d.size()) {
-      do {
-        auto it = d.lower_bound(t);
-        if (it != d.begin()) {
-          it--;
-          t -= *it;
-          d.erase(it);
-          cout << t << ' ';
-        } else {
-          if (zeroes) {
-            zeroes = false;
-            for (int j = 0; j < z; j++)
-              cout << t << ' ';
-          }
-          if (i < c.size()) {
-            t += c[i];
-            i++;
-            cout << t << ' ';
-          }
-          break;
-        }
-      } while (true);
-    }
-    if (zeroes) {
-      zeroes = false;
-      for (int j = 0; j < z; j++)
-        cout << t << ' ';
-    }
-    while (i < c.size()) {
-      t += c[i];
-      i++;
-      cout << t << ' ';
-    }
-  }
-  cout << '\n';
+  cout << ret << '\n';
 }
 
 int main() {

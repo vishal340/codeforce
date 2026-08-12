@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <bits/utility.h>
 using namespace std;
 
 using ll = long long;
@@ -109,72 +110,41 @@ template <typename T, typename... V> void _print(T t, V... v) {
 const int N = 2e5;
 
 void solve() {
-  int i, n;
-  cin >> n;
-  vector<int> b(n);
-  ll neg = 0, pos = 0;
-  int z = 0;
-  vi c;
-  multiset<int> d;
-  for (i = 0; i < n; i++) {
+  int i, n, m, x, y;
+  cin >> n >> m >> x >> y;
+  vi a(x), b(y);
+  for (i = 0; i < x; i++)
+    cin >> a[i];
+  for (i = 0; i < y; i++)
     cin >> b[i];
-  }
-  for (i = 0; i < n; i++) {
-    if (b[i] < 0) {
-      neg += -1 * b[i];
-      d.insert(-1 * b[i]);
-    } else if (b[i] > 0) {
-      pos += b[i];
-      c.push_back(b[i]);
-    } else {
-      z++;
-    }
-  }
+  int cycles = min(n - 1, x) + min(m - 1, y) + 1;
+  ll ret = 0;
+  vi c(a);
+  c.insert(c.end(), b.begin(), b.end());
   sort(all(c));
-  if (pos <= neg) {
-    cout << -1 << '\n';
+  int dist = 1;
+  ll ret1 = c[0];
+  for (i = 1; i < x + y; i++) {
+    if (c[i - 1] != c[i])
+      dist++, ret1 += c[i];
+  }
+  if (dist <= cycles) {
+    cout << ret1 << '\n';
     return;
   }
-  if (pos > neg) {
-    ll t = c[0];
-    cout << t << ' ';
-    i = 1;
-    bool zeroes = true;
-    while (d.size()) {
-      do {
-        auto it = d.lower_bound(t);
-        if (it != d.begin()) {
-          it--;
-          t -= *it;
-          d.erase(it);
-          cout << t << ' ';
-        } else {
-          if (zeroes) {
-            zeroes = false;
-            for (int j = 0; j < z; j++)
-              cout << t << ' ';
-          }
-          if (i < c.size()) {
-            t += c[i];
-            i++;
-            cout << t << ' ';
-          }
-          break;
-        }
-      } while (true);
-    }
-    if (zeroes) {
-      zeroes = false;
-      for (int j = 0; j < z; j++)
-        cout << t << ' ';
-    }
-    while (i < c.size()) {
-      t += c[i];
-      i++;
-      cout << t << ' ';
+  int t = 0;
+  for (i = x + y - 1; i > 0; i--) {
+    if (x + y - i - 1 == t + cycles)
+      break;
+    else {
+      if (c[i] == c[i - 1])
+        t++;
+      else {
+        ret += c[i];
+      }
     }
   }
-  cout << '\n';
+  cout << ret << '\n';
 }
 
 int main() {

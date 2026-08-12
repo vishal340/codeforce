@@ -18,7 +18,7 @@ using cpll = const pll;
 #define sz(x) static_cast<int>((x).size())
 #define all(x) (x).begin(), (x).end()
 
-constexpr int MOD = 1e9 + 7;
+constexpr int MOD = 998244353;
 
 struct mint {
   int val = 0;
@@ -109,72 +109,34 @@ template <typename T, typename... V> void _print(T t, V... v) {
 const int N = 2e5;
 
 void solve() {
-  int i, n;
+  int i = 0, n;
   cin >> n;
-  vector<int> b(n);
-  ll neg = 0, pos = 0;
-  int z = 0;
-  vi c;
-  multiset<int> d;
+  string s;
+  cin >> s;
+  int co = 0, cz = 0, o = 0, z = 0;
+  co += s[i] - '0';
+  cz += 1 - s[i] + '0';
+  for (i = 1; i < n; i++) {
+    if (s[i] != s[i - 1]) {
+      co += s[i] - '0';
+      cz += 1 - s[i] + '0';
+    }
+  }
   for (i = 0; i < n; i++) {
-    cin >> b[i];
+    z += 1 - s[i] + '0';
+    o += s[i] - '0';
   }
-  for (i = 0; i < n; i++) {
-    if (b[i] < 0) {
-      neg += -1 * b[i];
-      d.insert(-1 * b[i]);
-    } else if (b[i] > 0) {
-      pos += b[i];
-      c.push_back(b[i]);
-    } else {
-      z++;
-    }
+  mint ret = 1;
+  z--, o--, cz--, co--;
+  for (i = 0; i < cz; i++) {
+    ret = ret * (z - i);
+    ret = ret / (i + 1);
   }
-  sort(all(c));
-  if (pos <= neg) {
-    cout << -1 << '\n';
-    return;
+  for (i = 0; i < co; i++) {
+    ret = ret * (o - i);
+    ret = ret / (i + 1);
   }
-  if (pos > neg) {
-    ll t = c[0];
-    cout << t << ' ';
-    i = 1;
-    bool zeroes = true;
-    while (d.size()) {
-      do {
-        auto it = d.lower_bound(t);
-        if (it != d.begin()) {
-          it--;
-          t -= *it;
-          d.erase(it);
-          cout << t << ' ';
-        } else {
-          if (zeroes) {
-            zeroes = false;
-            for (int j = 0; j < z; j++)
-              cout << t << ' ';
-          }
-          if (i < c.size()) {
-            t += c[i];
-            i++;
-            cout << t << ' ';
-          }
-          break;
-        }
-      } while (true);
-    }
-    if (zeroes) {
-      zeroes = false;
-      for (int j = 0; j < z; j++)
-        cout << t << ' ';
-    }
-    while (i < c.size()) {
-      t += c[i];
-      i++;
-      cout << t << ' ';
-    }
-  }
-  cout << '\n';
+  cout << ret << '\n';
 }
 
 int main() {

@@ -109,72 +109,57 @@ template <typename T, typename... V> void _print(T t, V... v) {
 const int N = 2e5;
 
 void solve() {
-  int i, n;
-  cin >> n;
-  vector<int> b(n);
-  ll neg = 0, pos = 0;
-  int z = 0;
-  vi c;
-  multiset<int> d;
-  for (i = 0; i < n; i++) {
-    cin >> b[i];
-  }
-  for (i = 0; i < n; i++) {
-    if (b[i] < 0) {
-      neg += -1 * b[i];
-      d.insert(-1 * b[i]);
-    } else if (b[i] > 0) {
-      pos += b[i];
-      c.push_back(b[i]);
-    } else {
-      z++;
+  int i, x, y;
+  cin >> x >> y;
+  int n1 = 0, n = 0;
+  i = 1;
+  int cx = 0, cy = 0;
+  while (true) {
+    n1 += i;
+    i++;
+    if (n1 > x + y)
+      break;
+    else {
+      n = n1;
+      cx = min(n, x);
+      cy = n - cx;
     }
   }
-  sort(all(c));
-  if (pos <= neg) {
-    cout << -1 << '\n';
-    return;
-  }
-  if (pos > neg) {
-    ll t = c[0];
-    cout << t << ' ';
-    i = 1;
-    bool zeroes = true;
-    while (d.size()) {
-      do {
-        auto it = d.lower_bound(t);
-        if (it != d.begin()) {
-          it--;
-          t -= *it;
-          d.erase(it);
-          cout << t << ' ';
-        } else {
-          if (zeroes) {
-            zeroes = false;
-            for (int j = 0; j < z; j++)
-              cout << t << ' ';
-          }
-          if (i < c.size()) {
-            t += c[i];
-            i++;
-            cout << t << ' ';
-          }
-          break;
-        }
-      } while (true);
-    }
-    if (zeroes) {
-      zeroes = false;
-      for (int j = 0; j < z; j++)
-        cout << t << ' ';
-    }
-    while (i < c.size()) {
-      t += c[i];
-      i++;
-      cout << t << ' ';
+  ll mi = INT64_MAX;
+  int tx = cx + 1, ty = cy - 1;
+  while (ty != min(n, y)) {
+    ty++;
+    tx--;
+    ll t = (ll)(y - ty) * (y - ty) + (ll)(x - tx) * (x - tx);
+    if (t < mi) {
+      mi = t;
+      cx = tx;
+      cy = ty;
     }
   }
-  cout << '\n';
+  i -= 2;
+  string ret;
+  while (cx > 0 && cy > 0) {
+    if (cx >= i) {
+      cx -= i;
+      ret.push_back('X');
+    } else if (cy >= i) {
+      cy -= i;
+      ret.push_back('Y');
+    }
+    i--;
+  }
+  while (cy > 0) {
+    cy -= i;
+    ret.push_back('Y');
+    i--;
+  }
+  while (cx > 0) {
+    cx -= i;
+    ret.push_back('X');
+    i--;
+  }
+  cout << ret << '\n';
 }
 
 int main() {

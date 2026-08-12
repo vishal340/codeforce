@@ -128,68 +128,45 @@ template <typename T, typename... V> void _print(T t, V... v) {
 #endif
 
 void solve() {
-  int i, n, k;
+  int i, n;
+  ll k;
   cin >> n >> k;
-  if (k & 1) {
+  if ((k & 1) or (k < 2 * n - 2) or (k > ((ll)n * n) / 2)) {
     cout << -1 << '\n';
     return;
   }
   k -= 2 * n - 2;
-  if (k < 0) {
-    cout << -1 << '\n';
-    return;
-  }
   k >>= 1;
   vi ret(n);
   ret[0] = 1;
   ret[n - 1] = n;
-  int g = n - 2;
+  int j = n - 2;
   i = 1;
-  while (k > 0 && i < n - 1) {
-    if (g <= k + 1) {
-      ret[i] = ret[i - 1] + g;
-      k -= g - 1;
-      g -= 2;
-    } else {
-      ret[i] = ret[i - 1] + k + 1;
-      k = 0;
-    }
-    ret[i + 1] = ret[i - 1] + 1;
-    i += 2;
-  }
-  if (k > 0) {
-    cout << -1 << '\n';
-    return;
-  }
-  int j1 = i - 2, j2 = i - 4;
-  if (j1 > 0) {
-    for (int j = ret[i - 1] + 1; j < ret[j1]; j++) {
-      ret[i] = j;
+  while (true) {
+    if (k >= j - i && j > i) {
+      ret[i] = 2 * i + 1;
+      ret[j] = 2 * i;
+      k -= j - i;
       i++;
-    }
-    if (j2 > 0) {
-      for (int j = ret[j1] + 1; j < ret[j2]; j++) {
-        ret[i] = j;
-        i++;
+      j--;
+    } else if (k > 0 && k < j - i) {
+      ret[i] = 2 * i + 1;
+      ret[i + k] = 2 * i;
+      for (int l = i + 1; l < i + k; l++) {
+        ret[l] = l + i + 1;
       }
+      for (int l = i + k + 1; l <= j; l++) {
+        ret[l] = l + i;
+      }
+      break;
     } else {
-      for (int j = ret[j1] + 1; j < n; j++) {
-        ret[i] = j;
-        i++;
-      }
-    }
-    vi res(n);
-    for (i = 0; i < n; i++) {
-      res[ret[i] - 1] = i + 1;
-    }
-    for (i = 0; i < n - 1; i++) {
-      cout << res[i] << ' ' << res[i + 1] << '\n';
-    }
-  } else {
-    for (i = 0; i < n - 1; i++) {
-      cout << i + 1 << ' ' << i + 2 << '\n';
+      for (int l = i; l <= j; l++)
+        ret[l] = l + i;
+      break;
     }
   }
+  for (i = 0; i < n - 1; i++)
+    cout << ret[i] << ' ' << ret[i + 1] << '\n';
 }
 
 int main() {
