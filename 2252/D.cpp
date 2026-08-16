@@ -18,55 +18,6 @@ using cpll = const pll;
 #define sz(x) static_cast<int>((x).size())
 #define all(x) (x).begin(), (x).end()
 
-constexpr int MOD = 1e9 + 7;
-
-struct mint {
-  int val = 0;
-  mint(long long v = 0) { val = int((v % MOD + MOD) % MOD); }
-  mint operator+(const mint &o) const { return mint((val + o.val) % MOD); }
-  mint operator+(ll o) const { return mint((val + o) % MOD); }
-  mint operator*(const mint &o) const { return mint(1LL * val * o.val % MOD); }
-  mint operator*(ll o) const { return mint(1LL * val * o % MOD); }
-  mint operator/(const mint &o) const { return (*this) * o.inv(); }
-  friend mint operator+(ll o, const mint &m) { return mint((o + m.val) % MOD); }
-  friend mint operator*(ll o, const mint &m) {
-    return mint(1LL * o * m.val % MOD);
-  }
-  mint &operator+=(const mint &o) {
-    val = (val + o.val) % MOD;
-    return *this;
-  }
-  mint &operator+=(ll o) {
-    val = int((val + o) % MOD);
-    return *this;
-  }
-  mint &operator*=(const mint &o) {
-    val = int(1LL * val * o.val % MOD);
-    return *this;
-  }
-  mint &operator*=(ll o) {
-    val = int(1LL * val * o % MOD);
-    return *this;
-  }
-  mint &operator/=(const mint &o) { return *this *= o.inv(); }
-  mint pow(ll p) const {
-    mint a = *this, res = 1;
-    for (; p; p >>= 1, a *= a) {
-      if (p & 1)
-        res *= a;
-    }
-    return res;
-  }
-  mint inv() const { return pow(MOD - 2); }
-};
-ostream &operator<<(ostream &os, const mint &m) { return os << m.val; }
-istream &operator>>(istream &is, mint &m) {
-  long long v;
-  is >> v;
-  m = mint(v);
-  return is;
-}
-
 template <typename T>
 concept Printable = requires(ostream &os, const T &value) {
   { os << value } -> same_as<ostream &>;
@@ -109,11 +60,30 @@ template <typename T, typename... V> void _print(T t, V... v) {
 const int N = 2e5;
 
 void solve() {
-  int i, n;
+  int i = 0, n;
   cin >> n;
-  vi a(n);
-  for (i = 0; i < n; i++)
+  vll a(n);
+  for (i = 0; i < n; i++) {
     cin >> a[i];
+  }
+  vll d(n - 1);
+  for (i = 1; i < n; i++)
+    d[i - 1] = a[i] - a[i - 1];
+  for (i = 0; i < n - 1; i++) {
+    int j = i;
+    while (j < n - 1 && (d[j] & 1) == (d[i] & 1)) {
+      j++;
+    }
+    sort(d.begin() + i, d.begin() + j);
+    i = j;
+  }
+  cout << a[0] << " ";
+  long long cur = a[0];
+  for (int i = 0; i < n - 1; i++) {
+    cur += d[i];
+    cout << cur << " ";
+  }
+  cout << '\n';
 }
 
 int main() {
