@@ -74,10 +74,43 @@ template <typename T, typename... V> void _print(T t, V... v) {
 
 int N = 2e5;
 
+void print128(__uint128_t val) {
+  if (val == 0) {
+    cout << 0 << '\n';
+    return;
+  }
+  string s;
+  while (val > 0) {
+    s += static_cast<char>('0' + (val % 10));
+    val /= 10;
+  }
+  reverse(s.begin(), s.end());
+  cout << s;
+}
+
 void solve() {
   int i = 0, n;
   cin >> n;
-  __int128 a;
+  __uint128_t ret = 0;
+  vi a(n);
+  cin >> a;
+  stack<int> st;
+  st.push(a[0]);
+  for (i = 1; i < n; i++) {
+    while (!st.empty()) {
+      auto t = st.top();
+      if (a[i] % t == 0) {
+        break;
+      } else {
+        st.pop();
+        auto temp = a[i] % t;
+        ret += static_cast<__uint128_t>(n - i) *
+               static_cast<__uint128_t>(min(temp, t - temp));
+      }
+    }
+    st.push(a[i]);
+  }
+  print128(ret);
 }
 
 int main() {
