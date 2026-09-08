@@ -15,7 +15,7 @@ void solve() {
   for (i = 0; i <= 2 * k; i++) {
     sum -= a[i];
   }
-  b[k] = sum + (2 * k + 1) * a[k];
+  b[k] = sum + (long long)(2 * k + 1) * a[k];
   for (i = k + 1; i < n - k; i++) {
     b[i] = b[i - 1] + a[i - k - 1] - a[i + k] +
            (long long)(2 * k + 1) * (a[i] - a[i - 1]);
