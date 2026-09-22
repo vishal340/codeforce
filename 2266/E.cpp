@@ -86,48 +86,26 @@ template <typename T, typename... V> void _print(T t, V... v) {
 
 constexpr int N = 2e5;
 int lim = floor(sqrt(N)) + 1;
-ai(N + 1) dp;
-vi P;
+array<vector<int>, N + 1> dp;
 void solve() {
   int n, k;
   cin >> n >> k;
   vi a(n);
   cin >> a;
   sort(all(a));
+  vi ndp(n + 1, INT_MAX);
   ll acc = 0;
-  if (k > 1) {
-    vi ndp(a[n - 1] + 1);
-    rep(i, k + 1) ndp[i] = 0;
-    fora(i, k + 1, a[n - 1] + 1, 1) ndp[i] = dp[i];
-    int first = 0;
-    while (P[first] < k + 1) {
-      first++;
-    }
-    first--;
-    fora(i, k + 1, a[n - 1] + 1, 1) {
-      if (first < P.size() - 1 and P[first + 1] == i)
-        first++;
-      int pos = first;
-      while (pos >= 0 and i <= k * P[pos]) {
-        if (i % P[pos] == 0) {
-          ndp[i] = min(ndp[i], 1 + P[pos] * ndp[i / P[pos]]);
-          cout << ndp[i] << ' ';
-        }
-        pos--;
+  fora(i, 1, n + 1, 1) {
+    if (i <= k)
+      ndp[i] = 0;
+    else {
+      for (auto it : dp[i]) {
+        ndp[i] = min(ndp[i], 1 + ndp[i / it] * it);
       }
     }
-    // debug(ndp);
-    per(i, n) {
-      if (a[i] <= k)
-        break;
-      acc += ndp[a[i]];
-    }
-  } else {
-    per(i, n) {
-      if (a[i] <= k)
-        break;
-      acc += dp[a[i]];
-    }
+  }
+  for (auto it : a) {
+    acc += ndp[it];
   }
   cout << acc;
 }
@@ -136,33 +114,17 @@ int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(nullptr);
   cout.tie(nullptr);
-  vi prime(N + 1, 1);
-  prime[0] = prime[1] = 0;
-
-  for (int i = 2; i < N + 1; i++) {
-    if (!prime[i])
-      continue;
-
-    if (1LL * i * i > N)
-      break;
-    for (int j = i * i; j <= N; j += i) {
-      prime[j] = 0;
-    }
-  }
-  rep(i, N + 1) {
-    if (prime[i] == 1)
-      P.pb(i);
-  }
-  dp[0] = 0, dp[1] = 0;
-  int last = P.size() - 1;
-  fora(i, 2, N + 1, 1) {
-    int pos = 0;
-    dp[i] = INT_MAX;
-    while (pos <= last and P[pos] <= i) {
-      if (i % P[pos] == 0) {
-        dp[i] = min(dp[i], 1 + P[pos] * dp[i / P[pos]]);
+  {
+    vector<bool> cmp(N + 1, 0);
+    for (int i = 2; i < N + 1; i++) {
+      if (cmp[i])
+        continue;
+      cmp[i] = 1;
+      for (int j = 2 * i; j <= N; j += i) {
+        cmp[j] = 1;
+        dp[j].pb(i);
       }
-      pos++;
+      dp[i].pb(i);
     }
   }
   int t = 1;
