@@ -88,24 +88,51 @@ constexpr int MOD = 1e9 + 7;
 void solve() {
   int n;
   cin >> n;
-  vi c;
-  vi cont;
-  set<int> b;
-  rep(i, n) {
-    int x;
-    cin >> x;
-    b.insert(x - i);
+  vi a(n), b(n);
+  cin >> a >> b;
+  vector<vi> g(n);
+  rep(i, n - 1) {
+    int x, y;
+    cin >> x >> y;
+    x--, y--;
+    g[x].pb(y);
+    g[y].pb(x);
   }
-  copy(b.begin(), b.end(), back_inserter(c));
-  int cnt = 1, ma = 1;
-  fora(i, 1, c.size(), 1) {
-    if (c[i] == c[i - 1] + 1) {
-      ma = max(ma, ++cnt);
-    } else {
-      cnt = 1;
+  // acc[u] = step size g_u: reachable values are (a_u + k*g_u) mod b_u
+  vi acc(n, 0), parent(n, -1), order;
+  order.reserve(n);
+  {
+    vi st;
+    st.pb(0);
+    parent[0] = -2;
+    while (!st.empty()) {
+      auto u = st.back();
+      st.pop_back();
+      order.pb(u);
+      for (auto v : g[u]) {
+        if (parent[v] != -1)
+          continue;
+        parent[v] = u;
+        st.pb(v);
+      }
     }
   }
-  cout << ma;
+  per(i, sz(order)) {
+    int u = order[i];
+    ll S = 0;
+    for (int v : g[u]) {
+      if (v == parent[u])
+        continue;
+      S += a[v];
+      if (acc[v] != b[v])
+        acc[u] = gcd(acc[u], acc[v]);
+    }
+    acc[u] = gcd(acc[u], (int)(S % b[u]));
+    acc[u] = gcd(acc[u], b[u]);
+  }
+  ll ret = 0;
+  rep(i, n) ret += a[i] + (ll)((b[i] - 1 - a[i]) / acc[i]) * acc[i];
+  cout << ret;
 }
 
 int main() {

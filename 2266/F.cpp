@@ -88,24 +88,39 @@ constexpr int MOD = 1e9 + 7;
 void solve() {
   int n;
   cin >> n;
-  vi c;
-  vi cont;
-  set<int> b;
+  map<ll, ll> mult;
   rep(i, n) {
-    int x;
-    cin >> x;
-    b.insert(x - i);
+    int x, y;
+    cin >> x >> y;
+    mult[x] = y;
   }
-  copy(b.begin(), b.end(), back_inserter(c));
-  int cnt = 1, ma = 1;
-  fora(i, 1, c.size(), 1) {
-    if (c[i] == c[i - 1] + 1) {
-      ma = max(ma, ++cnt);
-    } else {
-      cnt = 1;
+  int ma = mult.rbegin()->first;
+  ll l = ma + 1, r = 1e9 + 31, mid;
+  while (l <= r) {
+    mid = (r + l) / 2;
+    ll acc = 1, exc = mult[0];
+    auto it = mult.rbegin();
+    ll i = mid - 1;
+    while (i) {
+      ll t = 0;
+      auto it = mult.find(i);
+      if (it != mult.end())
+        t = it->second;
+      if (t > acc)
+        exc += t - acc;
+      else
+        acc += acc - t;
+      if (acc > 1e15) {
+        break;
+      }
+      i--;
     }
+    if (exc >= acc)
+      l = mid + 1;
+    else
+      r = mid - 1;
   }
-  cout << ma;
+  cout << r;
 }
 
 int main() {
