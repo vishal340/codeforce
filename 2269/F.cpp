@@ -82,79 +82,56 @@ constexpr int MOD = 1e9 + 7;
 void solve() {
   int n;
   cin >> n;
-  vi a(n), L(n), R(n);
-  cin >> a;
-  rep(i, n) {
-    L[i] = i - 1;
-    while (L[i] != -1 and a[i] > a[L[i]])
-      L[i] = L[L[i]];
+  vi p(n + 2), R(n + 2), L(n + 2, n + 1);
+  vll dp(n + 2);
+  vector<vi> vec(n + 2);
+  vb mark(n + 2, false);
+  fora(i, 1, n + 1, 1) cin >> p[i];
+  forb(i, n + 1, 1, 1) {
+    for (R[i] = i + 1; R[i] <= n && p[R[i]] < p[i]; R[i] = R[R[i]])
+      ;
+    L[R[i]] = i;
   }
-  per(i, n) {
-    R[i] = i + 1;
-    while (R[i] != n and a[i] >= a[R[i]])
-      R[i] = R[R[i]];
-  }
-  int cur_iter = 0;
-  ai(1 << 18) pos{}, iter{};
-  auto la = [&](int mask) -> bool {
-    {
-      int pref = 0;
-      cur_iter++;
-      rep(i, n) {
-        if ((a[i] & mask) == mask) {
-          if (iter[pref] == cur_iter and pos[pref] > L[i] and pos[pref] < i)
-            return true;
-          if (i - L[i] > R[i] - i) {
-            int rx = 0;
-            fora(r, i + 1, R[i], 1) {
-              rx ^= a[r] & mask;
-              if (rx == 0)
-                return true; // empty left
-              int need = pref ^ rx; // want XOR[0..l-1] == need
-              if (iter[need] == cur_iter and pos[need] > L[i] and
-                  pos[need] < i)
-                return true;
-            }
-          }
-        }
-        pos[pref] = i;
-        iter[pref] = cur_iter;
-        pref ^= a[i] & mask;
+  auto solve_block = [&](int l, int r) {
+    dp[r] = r - l;
+    int lst = r, cnt = 0;
+    if (L[r] != n + 1) {
+      vec[L[r]].pb(r);
+      mark[r] = true;
+      cnt++;
+    }
+    forb(i, r, l, 1) {
+      while (!mark[lst])
+        lst--;
+      if (lst == R[i]) {
+        dp[i] = dp[R[i]] + (r - i - 1);
+      } else {
+        int c2 = R[i] - i - 1 + (R[R[i]] != n + 1) + cnt - 1 -
+                 (R[R[i]] != n + 1 && L[R[R[i]]] <= i);
+        dp[i] = dp[lst] + 2 * (r - i) - 2 - c2;
+      }
+      for (int j : vec[i]) {
+        mark[j] = false;
+        cnt--;
+      }
+      if (L[i] != n + 1) {
+        vec[L[i]].pb(i);
+        mark[i] = true;
+        cnt++;
       }
     }
-    {
-      int pref = 0;
-      cur_iter++;
-      per(i, n) {
-        if ((a[i] & mask) == mask) {
-          if (iter[pref] == cur_iter and pos[pref] < R[i] and pos[pref] > i)
-            return true;
-          if (i - L[i] <= R[i] - i) {
-            int lx = 0;
-            forb(l, i, L[i] + 1, 1) {
-              lx ^= a[l] & mask;
-              if (lx == 0)
-                return true; // empty right
-              int need = pref ^ lx; // want XOR[r+1..n-1] == need
-              if (iter[need] == cur_iter and pos[need] < R[i] and
-                  pos[need] > i)
-                return true;
-            }
-          }
-        }
-        pos[pref] = i;
-        iter[pref] = cur_iter;
-        pref ^= a[i] & mask;
-      }
-    }
-    return 0;
+    fora(i, l, r + 1, 1) dp[i] += l - 1;
   };
-  int ret = 0;
-  per(i, 18) {
-    if (la(ret | (1 << i)))
-      ret |= (1 << i);
+  int l = 1;
+  fora(r, 1, n + 1, 1) {
+    if (R[r] == n + 1) {
+      solve_block(l, r);
+      l = r + 1;
+    }
   }
-  cout << ret;
+  ll ans = 0;
+  fora(i, 1, n + 1, 1) ans += dp[i];
+  cout << ans;
 }
 
 int main() {
