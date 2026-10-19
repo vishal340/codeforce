@@ -1,0 +1,145 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define pb push_back
+using ll = long long;
+using ld = long double;
+using vi = vector<int>;
+using vb = vector<bool>;
+using vll = vector<long long>;
+#define ai(x) array<int, (x)>
+#define al(x) array<ll, (x)>
+#define ap(x) array<bool, (x)>
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+
+#define sz(x) static_cast<int>((x).size())
+#define all(x) (x).begin(), (x).end()
+#define fora(i, l, r, k) for (int i = (l); i < (r); i += (k))
+#define forb(i, r, l, k) for (int i = (r) - 1; i >= (l); i -= (k))
+#define rep(i, n) fora(i, 0, n, 1)
+#define per(i, n) forb(i, n, 0, 1)
+
+template <typename T> istream &operator>>(istream &in, vector<T> &vec) {
+  for (int i = 0; i < sz(vec); ++i)
+    in >> vec[i];
+  return in;
+}
+
+// cout-only: space-separated (do not use for debug / cerr).
+template <typename T> ostream &operator<<(ostream &out, const vector<T> &v) {
+  for (int i = 0; i < sz(v); ++i) {
+    if (i)
+      out << ' ';
+    out << v[i];
+  }
+  return out;
+}
+
+// cerr-only debug printers (ignore ostream<< for ranges/containers).
+template <typename T>
+concept DebugAtom = !is_array_v<remove_cvref_t<T>> && !requires(const T &t) {
+  t.begin();
+  t.end();
+} && requires(const T &x) { cerr << x; };
+template <DebugAtom T> void __print(const T &x) { cerr << x; }
+template <typename T, typename V> void __print(const pair<T, V> &x) {
+  cerr << '{';
+  __print(x.first);
+  cerr << ", ";
+  __print(x.second);
+  cerr << '}';
+}
+template <typename T>
+  requires(!DebugAtom<T>)
+void __print(const T &x) {
+  int f = 0;
+  cerr << '{';
+  for (auto &&e : x) {
+    cerr << (f++ ? ", " : "");
+    __print(e);
+  }
+  cerr << '}';
+}
+void _print() { cerr << "]\n"; }
+template <typename T, typename... V> void _print(T t, V... v) {
+  __print(t);
+  if (sizeof...(v))
+    cerr << ", ";
+  _print(v...);
+}
+
+#ifndef ONLINE_JUDGE
+#define debug(x...)                                                            \
+  cerr << "[" << #x << "] = [";                                                \
+  _print(x)
+#else
+#define debug(x...)
+#endif
+
+constexpr int MOD = 1e9 + 7;
+constexpr int N = 200000;
+
+static inline ll rng64() {
+  static ll x = (ll)(chrono::steady_clock::now().time_since_epoch().count()) *
+                10150724397891781847ULL;
+  const ll c = 0xd07ebc63274654c7ull;
+  x += c;
+  __uint128_t t = (__uint128_t)x * (x ^ c);
+  return t ^ (t >> 64);
+}
+
+void solve() {
+  int n, m;
+  cin >> n >> m;
+  vll a(n + 1);
+  map<ll, int> pos;
+  {
+    rep(i, m) {
+      int x, y;
+      cin >> x >> y;
+      x--, y--;
+      ll t = rng64();
+      a[x] ^= t;
+      a[y + 1] ^= t;
+    }
+    rep(i, n) a[i + 1] ^= a[i];
+    rep(i, n) { pos[a[i]] = i; }
+  }
+  vector<pair<int, ll>> d;
+  vector<pii> ret;
+  map<ll, int> st1;
+  rep(i, n) {
+    if ((d.empty() or i == pos[a[i]]) and !st1.count(a[i])) {
+      st1[a[i]] = i;
+    } else if (d.empty() or d.back().second == a[i]) {
+      d.pb({i, a[i]});
+    } else {
+      auto t1 = d.back();
+      d.pop_back();
+      ret.pb({t1.first, i});
+    }
+  }
+  int n1 = sz(d);
+  cout << sz(ret) + (n1 > 0 ? (n1 + 2) / 2 : 0) << '\n';
+  for (auto it : ret)
+    cout << it.first + 1 << ' ' << it.second + 1 << '\n';
+  if (n1 > 0)
+    rep(i, (n1 + 2) / 2) {
+      cout << d[i].first + 1 << ' ' << d[i + (n1 - 1) / 2].first + 1 << '\n';
+    }
+}
+
+int main() {
+  ios_base::sync_with_stdio(false);
+  cin.tie(nullptr);
+  cout.tie(nullptr);
+
+  int t = 1;
+  if (cin >> t) {
+    while (t--) {
+      solve();
+    }
+  }
+  return 0;
+}
