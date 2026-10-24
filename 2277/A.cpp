@@ -81,25 +81,21 @@ constexpr int MOD = 1e9 + 7;
 constexpr int N = 200000;
 
 void solve() {
-  int n, cnt = 0;
-  cin >> n;
-  string s;
-  cin >> s;
-  int beg = 0, e = 0;
-  bool b = false;
-  rep(i, n) {
-    if (s[i] == '1' and !b) {
-      cnt++;
-      b = 1;
-      beg = i;
-    } else if (s[i] == '1')
-      e = i, cnt++;
+  int n, k;
+  cin >> n >> k;
+  vi a(n);
+  cin >> a;
+  sort(all(a));
+  int ret = 0;
+  vi b(100, -1);
+  rep(i, n) { b[a[i]] = i; }
+  rep(i, 100) {
+    if (b[i] >= (k * (i + 1)) - 1)
+      ret++;
+    else
+      break;
   }
-  if (cnt > 2) {
-    cout << e - beg;
-  } else {
-    cout << cnt - 1;
-  }
+  cout << ret;
 }
 
 int main() {

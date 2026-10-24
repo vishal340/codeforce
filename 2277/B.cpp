@@ -85,47 +85,16 @@ void solve() {
   cin >> n;
   vi a(n);
   cin >> a;
-  sort(all(a));
-  vb b(30);
-  int t = a[n - 1];
-  if (t == 0) {
-    cout << 0;
-    return;
-  }
-  rep(i, n) t |= a[i];
-  int j = 0;
-  rep(i, 30) {
-    b[i] = ((t & 1) == 1);
-    t >>= 1;
-    if (t == 0) {
-      j = i;
+  int mn = INT_MAX;
+  rep(i, n) {
+    mn = min(mn, a[i]);
+    if (mn < n) {
+      cout << n;
       break;
+    } else if (i == n - 1) {
+      cout << 0;
     }
   }
-  vi c(n);
-  per(i, j + 1) {
-    if (!b[i]) {
-      rep(l, n) { c[l] = (a[l] >> (i + 1)); }
-      per(k, n - 1) {
-        if (c[k] != c[n - 1]) {
-          rep(l, i + 1) { b[l] = 1; }
-          int ret = 0;
-          rep(l, 30) {
-            if (b[l])
-              ret += (1 << l);
-          }
-          cout << ret;
-          return;
-        }
-      }
-    }
-  }
-  int ret = 0;
-  rep(i, 30) {
-    if (b[i])
-      ret += (1 << i);
-  }
-  cout << ret;
 }
 
 int main() {
