@@ -152,7 +152,6 @@ void solve() {
       }
     }
   }
-  debug(dist);
   rep(i, m) {
     if (vis[b[i] - 1]) {
       ret = max(ret, dist[b[i] - 1] + 1);
