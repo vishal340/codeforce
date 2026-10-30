@@ -92,7 +92,6 @@ void solve() {
   per(i, x) pref.pb(i);
   fora(i, x, 2 * x, 1) pref.pb(i);
   forb(i, 2 * x, x, 1) pref.pb(i);
-  debug(pref);
   cout << 4 * x - 1 << '\n';
   rep(i, 4 * x - 2) cout << (pref[i] ^ pref[i + 1]) << ' ';
   cout << (pref[4 * x - 2] ^ pref[4 * x - 1]);
