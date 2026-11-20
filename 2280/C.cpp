@@ -164,7 +164,6 @@ void solve() {
   int cur = b[0];
   ll mn = mx;
 
-  // Singleton [cur, cur].
   ll outside = max(cur >= 2 ? 1LL * pref[cur - 2] : 0LL,
                    cur + 1 < n - 1 ? 1LL * suff[cur + 1] : 0LL);
 
@@ -184,7 +183,6 @@ void solve() {
     val = max(val, abs(2LL * a[cur + 1] - a[cur + 2]));
   mn = min(mn, val);
 
-  // Segment [j, cur].
   ll mn1 = 0;
 
   forb(j, cur, 0, 1) {
@@ -205,7 +203,6 @@ void solve() {
     mn = min(mn, max({mn1, c1, c2, outside}));
   }
 
-  // Segment [cur + 1, j].
   mn1 = 0;
 
   fora(j, cur + 2, n, 1) {
